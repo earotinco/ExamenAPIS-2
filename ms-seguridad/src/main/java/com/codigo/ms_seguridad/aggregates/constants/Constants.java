@@ -11,10 +11,9 @@ public class Constants {
     public static final String ACCESS = "access";
     public static final String ENDPOINTS_PERMIT = "/auth/**";
     public static final String ENDPOINTS_ACTUATOR = "/actuator/refresh";
-
+    public static final String ENDPOINTS_ACTUATOR_BUS = "/actuator/busrefresh";
     public static final String ENDPOINTS_USER= "/users/user/**";
     public static final String ENDPOINTS_ADMIN = "/users/admin/**";
-
 
 
 }

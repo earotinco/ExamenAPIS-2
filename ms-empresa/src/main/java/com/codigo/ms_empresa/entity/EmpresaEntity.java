@@ -1,15 +1,12 @@
 package com.codigo.ms_empresa.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Timestamp;
 
 @Entity
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -23,6 +20,7 @@ public class EmpresaEntity {
 
     private String razonSocial;
     private String tipoDocumento;
+
     private String numeroDocumento;
     private String estado;
     private String condicion;

@@ -6,5 +6,7 @@ import com.codigo.ms_empresa.entity.EmpresaEntity;
 public interface EmpresaService {
 
     EmpresaEntity registrarEmpresa(EmpresaDto empresadto, String token);
-    EmpresaEntity obtenerEmpresaPorRUC(String ruc);
+    EmpresaDto obtenerEmpresaPorRUC(String ruc, String token);
+    EmpresaEntity actualizarEmpresa(Long id, EmpresaDto empresaDto);
+    void eliminarEmpresa(Long id);
 }

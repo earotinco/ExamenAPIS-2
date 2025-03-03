@@ -36,7 +36,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers(Constants.ENDPOINTS_PERMIT, Constants.ENDPOINTS_ACTUATOR).permitAll()
+                        request.requestMatchers(Constants.ENDPOINTS_PERMIT, Constants.ENDPOINTS_ACTUATOR, Constants.ENDPOINTS_ACTUATOR_BUS).permitAll()
                                 .requestMatchers(Constants.ENDPOINTS_USER).hasAnyAuthority(Role.USER.name())
                                 .requestMatchers(Constants.ENDPOINTS_ADMIN).hasAnyAuthority(Role.ADMIN.name())
                                 .anyRequest().authenticated()) //cualquier otra requiere autenticacion

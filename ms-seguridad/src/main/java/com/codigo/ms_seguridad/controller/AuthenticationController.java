@@ -12,7 +12,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,6 +27,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/auth/")
 @RequiredArgsConstructor
+@Log4j2
+@RefreshScope
 public class AuthenticationController {
 
 
@@ -66,6 +70,7 @@ public class AuthenticationController {
         return ResponseEntity.ok("Hola Admin! ---Probando");
     }
 
+
     /*REFRESH TOKEN*/
     @PostMapping("/refreshtoken")
     public ResponseEntity<SignInResponse> refreshToken(
@@ -86,6 +91,8 @@ public class AuthenticationController {
 
     @PostMapping("/validatetoken")
     public ResponseEntity<Boolean> validateToken(@RequestHeader("Authorization") String header) {
+
+
 
         String token = header.replace("Bearer ", "");
         String ussername = jwtService.extractUsername(token);

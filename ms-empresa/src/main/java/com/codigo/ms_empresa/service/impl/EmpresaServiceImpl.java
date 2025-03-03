@@ -4,12 +4,15 @@ import com.codigo.ms_empresa.aggregates.dto.EmpresaDto;
 import com.codigo.ms_empresa.aggregates.response.ResponseUserInfo;
 import com.codigo.ms_empresa.client.SeguridadClient;
 import com.codigo.ms_empresa.entity.EmpresaEntity;
+import com.codigo.ms_empresa.mapper.EmpresaMapper;
 import com.codigo.ms_empresa.repository.EmpresaRepository;
 import com.codigo.ms_empresa.service.EmpresaService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 
 @Service
@@ -20,61 +23,73 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     private final SeguridadClient seguridadClient;
 
+    private final EmpresaMapper empresaMapper;
+
+
 
     @Override
     public EmpresaEntity registrarEmpresa(EmpresaDto request, String token) {
 
 
-
-        Boolean tokenValido = seguridadClient.validateToken(token);
-        if (Boolean.FALSE.equals(tokenValido)) {
-            throw new RuntimeException("Token inválido.");
+        if (!seguridadClient.validateToken(token)) {
+            throw new RuntimeException("Token inválido o expirado");
         }
-        System.out.println("RegistrarEmpresa EmpresaServiceImpl: Paso el Filtro Validar TOken");
+
+
+        Optional<EmpresaEntity> empresaExistente = Optional.ofNullable(empresaRepository.findByNumeroDocumento(request.getNumeroDocumento()));
+
+        if (empresaExistente.isPresent()) {
+            throw new RuntimeException("Ya existe una empresa con el número de documento: " + request.getNumeroDocumento());
+        }
+
+
 
         ResponseUserInfo userInfo = seguridadClient.getUserInfo(token);
-        System.out.println("Registrar Empresa userInfo: "+userInfo);
 
-        EmpresaEntity empresa = EmpresaEntity.builder()
-                .razonSocial(request.getRazonSocial())
-                .tipoDocumento(request.getTipoDocumento())
-                .numeroDocumento(request.getNumeroDocumento())
-                .estado(request.getEstado())
-                .condicion(request.getCondicion())
-                .direccion(request.getDireccion())
-                .ubigeo(request.getUbigeo())
-                .viaTipo(request.getViaTipo())
-                .viaNombre(request.getViaNombre())
-                .zonaCodigo(request.getZonaCodigo())
-                .zonaTipo(request.getZonaTipo())
-                .numero(request.getNumero())
-                .interior(request.getInterior())
-                .lote(request.getLote())
-                .dpto(request.getDpto())
-                .manzana(request.getManzana())
-                .kilometro(request.getKilometro())
-                .distrito(request.getDistrito())
-                .provincia(request.getProvincia())
-                .departamento(request.getDepartamento())
-                .esAgenteRetencion(request.getEsAgenteRetencion())
-                .esBuenContribuyente(request.getEsBuenContribuyente())
-                .tipo(request.getTipo())
-                .actividadEconomica(request.getActividadEconomica())
-                .numeroTrabajadores(request.getNumeroTrabajadores())
-                .tipoFacturacion(request.getTipoFacturacion())
-                .tipoContabilidad(request.getTipoContabilidad())
-                .comercioExterior(request.getComercioExterior())
-                .usuarioRegistro("Earotinco")
-                .fechaRegistro(new Timestamp(System.currentTimeMillis()))
-                .build();
+
+        EmpresaEntity empresa = empresaMapper.toEntity(request);
+
+
+        empresa.setUsuarioRegistro(userInfo.getUsername());
+        empresa.setFechaRegistro(new Timestamp(System.currentTimeMillis()));
 
         return empresaRepository.save(empresa);
     }
 
     @Override
-    public EmpresaEntity obtenerEmpresaPorRUC(String ruc) {
-        return empresaRepository.findByNumeroDocumento(ruc)
-                .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+    public EmpresaDto obtenerEmpresaPorRUC(String ruc, String token) {
+
+
+        if (!seguridadClient.validateToken(token)) {
+            throw new RuntimeException("Token inválido o expirado");
+        }
+
+        EmpresaEntity empresa = empresaRepository.findByNumeroDocumento(ruc);
+        if (empresa == null) {
+            throw new EntityNotFoundException("No se encontró una empresa con el RUC: " + ruc);
+        }
+
+        return empresaMapper.toDto(empresa);
     }
+
+    @Override
+    public EmpresaEntity actualizarEmpresa(Long id, EmpresaDto empresaDto) {
+        EmpresaEntity empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No se encontró la empresa con ID: " + id));
+
+        EmpresaEntity empresaEntity = empresaMapper.toEntity(empresaDto);
+        return empresaRepository.save(empresaEntity);
     }
+
+    @Override
+    public void  eliminarEmpresa(Long id) {
+        EmpresaEntity empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No se encontró la empresa con ID: " + id));
+
+        empresaRepository.delete(empresa);
+
+    }
+
+
+}
 

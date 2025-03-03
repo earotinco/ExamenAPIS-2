@@ -1,11 +1,12 @@
 package com.codigo.ms_empresa.aggregates.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-//@Data   --- toString(), equals(), o hashCode()
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class EmpresaDto {
 
     private String razonSocial;

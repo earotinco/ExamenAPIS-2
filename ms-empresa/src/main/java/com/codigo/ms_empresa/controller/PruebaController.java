@@ -1,22 +1,23 @@
 package com.codigo.ms_empresa.controller;
 
 import com.codigo.ms_empresa.client.SeguridadClient;
-import com.codigo.ms_empresa.service.EmpresaService;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
+
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/auth/")
 @RequiredArgsConstructor
 @RefreshScope
 public class PruebaController {
 
 
+    @Value("${dato.propiedad}")
+    private String valorPropiedad;
 
 
     private final SeguridadClient seguridadClient;
@@ -35,13 +36,11 @@ public class PruebaController {
         return ResponseEntity.ok(seguridadClient.getPropiedades(token));
     }
 
-
-    @GetMapping("/suma")
-    public ResponseEntity<Integer> getSuma(){
-        int a = 4;
-        int b = 5;
-        log.info("Suma: "+a+b);
-        return ResponseEntity.ok(a+b) ;
+    @GetMapping("/pruebapropiedad")
+    public ResponseEntity<String> getPorpiedadConfig(){
+        return ResponseEntity.ok(valorPropiedad);
     }
+
+
 
 }
